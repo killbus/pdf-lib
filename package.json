@@ -1,6 +1,6 @@
 {
-  "name": "@cantoo/pdf-lib",
-  "version": "2.9.1",
+  "name": "@killbus/pdf-lib",
+  "version": "2.9.2",
   "description": "Create and modify PDF files with JavaScript",
   "author": "Andrew Dillon <andrew.dillon.j@gmail.com>",
   "packageManager": "yarn@1.22.19",
@@ -49,10 +49,11 @@
     "Eran Ohayon (https://github.com/erano067)"
   ],
   "scripts": {
-    "release": "yarn release:prep && release-it",
+    "prepare": "yarn build",
+    "release": "yarn release:prep && release-it --no-npm",
     "release:prep": "yarn lint && yarn clean && yarn typecheck && yarn test && yarn build",
     "get:version": "node --eval 'console.log(require(`./package.json`).version)'",
-    "clean": "rimraf ts3.4 build cjs dist es scratchpad/build coverage tsBuildInfo.json apps/node-build apps/node/tsBuildInfo.json isolate*.log flamegraph.html out.pdf",
+    "clean": "rimraf --glob ts3.4 build cjs dist es scratchpad/build coverage tsBuildInfo.json apps/node-build apps/node/tsBuildInfo.json isolate*.log flamegraph.html out.pdf",
     "typecheck": "tsc --noEmit --incremental false --tsBuildInfoFile null",
     "test": "jest --config jest.config.js --runInBand",
     "testw": "jest --config jest.config.js --watch",
@@ -156,9 +157,9 @@
   "license": "MIT",
   "private": false,
   "homepage": "https://pdf-lib.js.org",
-  "repository": "git+https://github.com/cantoo-scribe/pdf-lib.git",
+  "repository": "git+https://github.com/killbus/pdf-lib.git",
   "bugs": {
-    "url": "https://github.com/cantoo-scribe/pdf-lib/issues"
+    "url": "https://github.com/killbus/pdf-lib/issues"
   },
   "keywords": [
     "pdf-lib",

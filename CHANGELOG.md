@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.2]
+
+- Treat a page dictionary without /Contents as a valid zero-content page when
+  embedding it as a Form XObject. Present malformed or undecodable content still
+  fails normally.
+- Build the declared package entry points during Git dependency installation so
+  package-manager Git references are usable without separately published artifacts.
+
 ## [2.9.1]
 
 - `PDFDocument.encrypt()` defaults to AES-256 (`/V 5`, `/R 6`, ISO 32000-2
@@ -104,7 +112,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   page content or generate/validate invoice XML. Use embedded fonts and validate
   with veraPDF (and a Factur-X checker for e-invoices).
 
-[2.9.1]: https://github.com/cantoo-scribe/pdf-lib/compare/v2.9.0...HEAD
+[2.9.2]: https://github.com/killbus/pdf-lib/compare/v2.9.1...v2.9.2
+[2.9.1]: https://github.com/cantoo-scribe/pdf-lib/compare/v2.9.0...v2.9.1
 [2.9.0]: https://github.com/cantoo-scribe/pdf-lib/compare/v2.8.4...v2.9.0
 [2.8.4]: https://github.com/cantoo-scribe/pdf-lib/compare/v2.8.2...v2.8.4
 [2.8.2]: https://github.com/cantoo-scribe/pdf-lib/compare/v2.8.1...v2.8.2

@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+      - name: Enable the pinned Yarn version
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.19 --activate
+      - name: Verify release identity
+        run: |
+          node <<'NODE'
+          const pkg = require('./package.json');
+          const expectedTag = `v${pkg.version}`;
+          if (pkg.name !== '@killbus/pdf-lib') throw new Error(`Unexpected package name: ${pkg.name}`);
+          if (process.env.GITHUB_REF_NAME !== expectedTag) throw new Error(`Tag ${process.env.GITHUB_REF_NAME} does not match ${expectedTag}`);
+          NODE
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
+      - run: git diff --exit-code
+      - run: yarn clean
+      - run: yarn typecheck
+      - run: yarn test
+      - run: yarn build
+      - name: Pack release artifact
+        run: |
+          mkdir release
+          PACKED_TARBALL="$(npm pack --pack-destination release | tail -n 1)"
+          VERSION="$(node -p "require('./package.json').version")"
+          TARBALL="pdf-lib-${VERSION}.tgz"
+          mv "release/$PACKED_TARBALL" "release/$TARBALL"
+          echo "TARBALL=$TARBALL" >> "$GITHUB_ENV"
+      - name: Verify packed package in isolation
+        run: |
+          CONSUMER_DIR="$(mktemp -d)"
+          cd "$CONSUMER_DIR"
+          npm init -y >/dev/null
+          npm install --ignore-scripts "$GITHUB_WORKSPACE/release/$TARBALL"
+          node <<'NODE'
+          const { PDFDocument } = require('@killbus/pdf-lib');
+          (async () => {
+            const source = await PDFDocument.create();
+            source.addPage([120, 80]);
+            const output = await PDFDocument.create();
+            const [embeddedPage] = await output.embedPdf(await source.save(), [0]);
+            const page = output.addPage([embeddedPage.width, embeddedPage.height]);
+            page.drawPage(embeddedPage);
+            const reloaded = await PDFDocument.load(await output.save());
+            const [reloadedPage] = reloaded.getPages();
+            if (reloaded.getPageCount() !== 1 || reloadedPage.getWidth() !== 120 || reloadedPage.getHeight() !== 80) {
+              throw new Error('Packed missing-/Contents regression smoke test failed');
+            }
+          })().catch(error => { console.error(error); process.exitCode = 1; });
+          NODE
+      - name: Generate checksum
+        run: |
+          cd release
+          sha256sum "$TARBALL" > SHA256SUMS
+      - name: Create immutable GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "release/$TARBALL" \
+            "release/SHA256SUMS" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes

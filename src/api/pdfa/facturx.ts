@@ -167,7 +167,7 @@ export const buildFacturXDescription = (options: {
  *
  * For example:
  * ```js
- * import { PDFDocument, embedFacturX } from '@cantoo/pdf-lib'
+ * import { PDFDocument, embedFacturX } from '@killbus/pdf-lib'
  * import * as fontkit from 'fontkit'
  *
  * const pdfDoc = await PDFDocument.create()

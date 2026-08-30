@@ -2,7 +2,7 @@
 
 This fork adds the support for svg to the pdf-lib project. Until pdf-lib project gets a better maintainance, we will maintain this project as long as we need it but cannot guarantee the support for issues too far from our own roadmap.
 
-Install with: `npm install @cantoo/pdf-lib`
+Install this fork from the immutable GitHub Release asset: `npm install https://github.com/killbus/pdf-lib/releases/download/v2.9.2/pdf-lib-2.9.2.tgz`
 
 <hr/>
 
@@ -1237,7 +1237,7 @@ standard fonts are not PDF/A compliant). Validate the result with a tool such as
 
 <!-- prettier-ignore -->
 ```js
-import { PDFDocument } from '@cantoo/pdf-lib'
+import { PDFDocument } from '@killbus/pdf-lib'
 import * as fontkit from 'fontkit'
 
 const fontBytes = ... // e.g. fs.readFileSync('Roboto-Regular.ttf')
@@ -1279,7 +1279,7 @@ complete `factur-x.xml` from your invoicing stack.
 
 <!-- prettier-ignore -->
 ```js
-import { PDFDocument, embedFacturX } from '@cantoo/pdf-lib'
+import { PDFDocument, embedFacturX } from '@killbus/pdf-lib'
 import * as fontkit from 'fontkit'
 
 const fontBytes = ...
@@ -1714,7 +1714,7 @@ This assumes you're using [npm](https://www.npmjs.com/) or [yarn](https://yarnpk
 
 ### Pinning `pako` to v2
 
-`@cantoo/pdf-lib` depends on [`pako`](https://www.npmjs.com/package/pako) v2. Some transitive dependencies still declare older ranges (`@pdf-lib/standard-fonts`, `@pdf-lib/upng`, and — if you use custom fonts — `fontkit` → `unicode-trie`). Those call sites are compatible with pako v2, so this package forces a single version via Yarn `resolutions` / npm `overrides`.
+`@killbus/pdf-lib` depends on [`pako`](https://www.npmjs.com/package/pako) v2. Some transitive dependencies still declare older ranges (`@pdf-lib/standard-fonts`, `@pdf-lib/upng`, and — if you use custom fonts — `fontkit` → `unicode-trie`). Those call sites are compatible with pako v2, so this package forces a single version via Yarn `resolutions` / npm `overrides`.
 
 That force only applies when installing **this** repository. In your own app, add the same pin if you want one `pako@2` everywhere:
 
