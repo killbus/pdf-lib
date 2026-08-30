@@ -1,7 +1,4 @@
-import {
-  MissingPageContentsEmbeddingError,
-  UnrecognizedStreamTypeError,
-} from '../errors';
+import { UnrecognizedStreamTypeError } from '../errors';
 import PDFArray from '../objects/PDFArray';
 import PDFNumber from '../objects/PDFNumber';
 import PDFRawStream from '../objects/PDFRawStream';
@@ -94,8 +91,9 @@ class PDFPageEmbedder {
   async embedIntoContext(context: PDFContext, ref?: PDFRef): Promise<PDFRef> {
     const { Contents, Resources } = this.page.normalizedEntries();
 
-    if (!Contents) throw new MissingPageContentsEmbeddingError();
-    const decodedContents = this.decodeContents(Contents);
+    const decodedContents = Contents
+      ? this.decodeContents(Contents)
+      : new Uint8Array();
 
     const { left, bottom, right, top } = this.boundingBox;
     const xObject = context.flateStream(decodedContents, {

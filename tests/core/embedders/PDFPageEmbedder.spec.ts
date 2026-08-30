@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { PDFDocument } from '../../../src/api';
 import {
+  decodePDFRawStream,
   PDFContext,
   PDFName,
   PDFPageEmbedder,
@@ -33,6 +34,23 @@ describe('PDFPageEmbedder', () => {
     expect(context.enumerateIndirectObjects().length).toBe(1);
     expect(context.lookup(predefinedRef)).toBeInstanceOf(PDFRawStream);
     expect(ref).toBe(predefinedRef);
+  });
+
+  it('embeds pages without Contents as empty Form XObjects', async () => {
+    const source = await PDFDocument.create();
+    const page = source.addPage([200, 100]);
+    page.node.delete(PDFName.Contents);
+
+    const context = PDFContext.create();
+    const embedder = await PDFPageEmbedder.for(page.node);
+    const ref = await embedder.embedIntoContext(context);
+    const xObject = context.lookup(ref);
+
+    expect(xObject).toBeInstanceOf(PDFRawStream);
+    const stream = xObject as PDFRawStream;
+    expect(decodePDFRawStream(stream).decode()).toEqual(new Uint8Array());
+    expect(stream.dict.get(PDFName.Type)).toBe(PDFName.XObject);
+    expect(stream.dict.get(PDFName.of('Subtype'))).toBe(PDFName.of('Form'));
   });
 
   it('can extract properties of the PDF page', async () => {
